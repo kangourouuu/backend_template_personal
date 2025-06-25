@@ -1,0 +1,42 @@
+package service
+
+import (
+	"{{.ProjectName}}/model"
+	"{{.ProjectName}}/repository"
+)
+
+type {{.EntityName}}Service interface {
+	Create{{.EntityName}}({{.EntityNameLower}} *model.{{.EntityName}}) error
+	Get{{.EntityName}}ByID(id uint) (*model.{{.EntityName}}, error)
+	GetAll{{.EntityName}}s() ([]*model.{{.EntityName}}, error)
+	Update{{.EntityName}}({{.EntityNameLower}} *model.{{.EntityName}}) error
+	Delete{{.EntityName}}(id uint) error
+}
+
+type {{.EntityNameLower}}Service struct {
+	repo repository.{{.EntityName}}Repository
+}
+
+func New{{.EntityName}}Service(repo repository.{{.EntityName}}Repository) {{.EntityName}}Service {
+	return &{{.EntityNameLower}}Service{repo: repo}
+}
+
+func (s *{{.EntityNameLower}}Service) Create{{.EntityName}}({{.EntityNameLower}} *model.{{.EntityName}}) error {
+	return s.repo.Create({{.EntityNameLower}})
+}
+
+func (s *{{.EntityNameLower}}Service) Get{{.EntityName}}ByID(id uint) (*model.{{.EntityName}}, error) {
+	return s.repo.FindByID(id)
+}
+
+func (s *{{.EntityNameLower}}Service) GetAll{{.EntityName}}s() ([]*model.{{.EntityName}}, error) {
+	return s.repo.FindAll()
+}
+
+func (s *{{.EntityNameLower}}Service) Update{{.EntityName}}({{.EntityNameLower}} *model.{{.EntityName}}) error {
+	return s.repo.Update({{.EntityNameLower}})
+}
+
+func (s *{{.EntityNameLower}}Service) Delete{{.EntityName}}(id uint) error {
+	return s.repo.Delete(id)
+}

@@ -1,0 +1,26 @@
+package api
+
+import (
+	api "{{.ProjectName}}/api/v2"
+	"{{.ProjectName}}/repository"
+	"{{.ProjectName}}/service"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+func SetupRoutes(r *gin.Engine, db *gorm.DB) {
+	{{.EntityNameLower}}Repo := repository.New{{.EntityName}}Repository(db)
+	{{.EntityNameLower}}Service := service.New{{.EntityName}}Service({{.EntityNameLower}}Repo)
+	{{.EntityNameLower}}Handler := api.New{{.EntityName}}Handler({{.EntityNameLower}}Service)
+
+	// API v2 routes
+	v2 := r.Group("/api/v2")
+	{
+		v2.POST("/{{.EntityNameLower}}", {{.EntityNameLower}}Handler.Create{{.EntityName}})
+		v2.GET("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Get{{.EntityName}})
+		v2.GET("/{{.EntityNameLower}}", {{.EntityNameLower}}Handler.GetAll{{.EntityName}}s)
+		v2.PUT("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Update{{.EntityName}})
+		v2.DELETE("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Delete{{.EntityName}})
+	}
+}

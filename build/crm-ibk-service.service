@@ -1,0 +1,13 @@
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/go/src/crm-ibk-service
+ExecStart=/root/go/src/crm-ibk-service/app.exe
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+Description=crm
+After=network.target

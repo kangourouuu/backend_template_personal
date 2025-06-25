@@ -1,0 +1,21 @@
+package dto
+
+type Create{{.EntityName}}Request struct {
+{{- range .Fields }}
+	{{- if ne .Name "ID" }}
+	{{.Name}} {{.Type}} `json:"{{ lowerFirst .Name }}" validate:"required"`
+	{{- end }}
+{{- end }}
+}
+
+type Update{{.EntityName}}Request struct {
+{{- range .Fields }}
+	{{.Name}} {{.Type}} `json:"{{ lowerFirst .Name }}" validate:"required"`
+{{- end }}
+}
+
+type {{.EntityName}}Response struct {
+{{- range .Fields }}
+	{{.Name}} {{.Type}} `json:"{{ lowerFirst .Name }}"`
+{{- end }}
+}

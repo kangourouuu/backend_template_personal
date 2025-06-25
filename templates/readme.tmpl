@@ -1,0 +1,9 @@
+go mod tidy // for install all dependencies
+
+
+go install github.com/swaggo/swag/cmd/swag@latest // install swagger cli 
+
+go get github.com/swaggo/swag@latest // upgrate swagger for fix bug LeftDelim, 
+RightDelim
+
+swag init // create docs file 

@@ -1,0 +1,56 @@
+package repository
+
+import (
+	"{{.ProjectName}}/model"
+	"gorm.io/gorm"
+)
+
+func (r *{{ .EntityNameLower }}Repository) migrate() error {
+    return r.db.AutoMigrate(&model.{{ .EntityName }}{})
+}
+
+type {{.EntityName}}Repository interface {
+	Create({{.EntityNameLower}} *model.{{.EntityName}}) error
+	FindByID(id uint) (*model.{{.EntityName}}, error)
+	FindAll() ([]*model.{{.EntityName}}, error)
+	Update({{.EntityNameLower}} *model.{{.EntityName}}) error
+	Delete(id uint) error
+}
+
+type {{.EntityNameLower}}Repository struct {
+	db *gorm.DB
+}
+
+func New{{.EntityName}}Repository(db *gorm.DB) {{.EntityName}}Repository {
+	repo := &{{.EntityNameLower}}Repository{db: db}
+    _ = repo.migrate() // Tự động migrate khi khởi tạo repository
+    return repo
+}
+
+func (r *{{.EntityNameLower}}Repository) Create({{.EntityNameLower}} *model.{{.EntityName}}) error {
+	return r.db.Create({{.EntityNameLower}}).Error
+}
+
+func (r *{{.EntityNameLower}}Repository) FindByID(id uint) (*model.{{.EntityName}}, error) {
+	var {{.EntityNameLower}} model.{{.EntityName}}
+	if err := r.db.First(&{{.EntityNameLower}}, id).Error; err != nil {
+		return nil, err
+	}
+	return &{{.EntityNameLower}}, nil
+}
+
+func (r *{{.EntityNameLower}}Repository) FindAll() ([]*model.{{.EntityName}}, error) {
+	var {{.EntityNameLower}}s []*model.{{.EntityName}}
+	if err := r.db.Find(&{{.EntityNameLower}}s).Error; err != nil {
+		return nil, err
+	}
+	return {{.EntityNameLower}}s, nil
+}
+
+func (r *{{.EntityNameLower}}Repository) Update({{.EntityNameLower}} *model.{{.EntityName}}) error {
+	return r.db.Save({{.EntityNameLower}}).Error
+}
+
+func (r *{{.EntityNameLower}}Repository) Delete(id uint) error {
+	return r.db.Delete(&model.{{.EntityName}}{}, id).Error
+}

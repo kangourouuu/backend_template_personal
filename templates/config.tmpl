@@ -1,0 +1,25 @@
+{
+	"main": {
+		"port": {{ .Port }},
+		"log_type": "FILE",
+		"log_file": "tmp/console.log",
+		"db": "enabled",
+		"redis": "false"
+	},
+	"redis": {
+		"address": "localhost:6379",
+		"database": 0,
+		"password": ""
+	},
+	"db": {
+		"driver": "postgres",
+		"host": "localhost",
+		"port": 5432,
+		"username": "postgres",
+		"password": "Quockhanh208@",
+		"database": "backend_template"
+	},
+	"auth_proxy": {
+		"auth_url": "http://localhost:8080"
+	}
+}

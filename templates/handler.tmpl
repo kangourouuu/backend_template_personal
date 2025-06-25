@@ -1,0 +1,154 @@
+package api
+
+import (
+	"net/http"
+	"strconv"
+
+	"{{.ProjectName}}/dto"
+	"{{.ProjectName}}/model"
+	"{{.ProjectName}}/service"
+
+	"github.com/gin-gonic/gin"
+)
+
+type {{.EntityName}}Handler struct {
+	{{.EntityNameLower}}Service service.{{.EntityName}}Service
+}
+
+func New{{.EntityName}}Handler({{.EntityNameLower}}Service service.{{.EntityName}}Service) *{{.EntityName}}Handler {
+	return &{{.EntityName}}Handler{ {{.EntityNameLower}}Service: {{.EntityNameLower}}Service }
+}
+
+func (h *{{.EntityName}}Handler) Create{{.EntityName}}(c *gin.Context) {
+	var req dto.Create{{.EntityName}}Request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	obj := &model.{{.EntityName}}{
+	{{- range .Fields }}
+		{{- if ne .Name "ID" }} // ne : not equal
+		{{.Name}}: req.{{.Name}},
+		{{- end }}
+	{{- end }}
+	}
+
+	if err := h.{{.EntityNameLower}}Service.Create{{.EntityName}}(obj); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create {{.EntityNameLower}}"})
+		return
+	}
+
+	resp := dto.{{.EntityName}}Response{
+	{{- range .Fields }}
+		{{.Name}}: obj.{{.Name}},
+	{{- end }}
+	}
+
+	c.JSON(http.StatusCreated, resp)
+}
+
+func (h *{{.EntityName}}Handler) Get{{.EntityName}}(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	obj, err := h.{{.EntityNameLower}}Service.Get{{.EntityName}}ByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "{{.EntityName}} not found"})
+		return
+	}
+
+	resp := dto.{{.EntityName}}Response{
+	{{- range .Fields }}
+		{{.Name}}: obj.{{.Name}},
+	{{- end }}
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *{{.EntityName}}Handler) GetAll{{.EntityName}}s(c *gin.Context) {
+	list, err := h.{{.EntityNameLower}}Service.GetAll{{.EntityName}}s()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get {{.EntityNameLower}}s"})
+		return
+	}
+
+	var resp []dto.{{.EntityName}}Response
+	for _, s := range list {
+		resp = append(resp, dto.{{.EntityName}}Response{
+		{{- range .Fields }}
+			{{.Name}}: s.{{.Name}},
+		{{- end }}
+		})
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *{{.EntityName}}Handler) Update{{.EntityName}}(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	existing{{.EntityName}}, err := h.{{$.EntityNameLower}}Service.Get{{.EntityName}}ByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "{{.EntityName}} not found"})
+		return
+	}
+
+	var req dto.Update{{.EntityName}}Request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	{{.EntityNameLower}} := &model.{{$.EntityName}}{
+	{{- range .Fields }}
+		{{- if eq .Name "ID" }}
+		{{.Name}}: existing{{$.EntityName}}.{{.Name}},
+		{{- else }}
+		{{.Name}}: req.{{.Name}},
+		{{- end }}
+	{{- end }}
+	}
+
+	if err := h.{{$.EntityNameLower}}Service.Update{{.EntityName}}({{.EntityNameLower}}); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update {{$.EntityNameLower}}"})
+		return
+	}
+
+	resp := dto.{{$.EntityName}}Response{
+	{{- range .Fields }}
+		{{.Name}}: {{$.EntityNameLower}}.{{.Name}},
+	{{- end }}
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *{{.EntityName}}Handler) Delete{{.EntityName}}(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	_, err = h.{{.EntityNameLower}}Service.Get{{.EntityName}}ByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "{{.EntityName}} not found"})
+		return
+	}
+
+	if err := h.{{.EntityNameLower}}Service.Delete{{.EntityName}}(uint(id)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete {{.EntityNameLower}}"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "{{.EntityName}} deleted successfully"})
+}
