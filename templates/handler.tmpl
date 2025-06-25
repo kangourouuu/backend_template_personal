@@ -3,20 +3,26 @@ package api
 import (
 	"net/http"
 	"strconv"
+	"fmt"
+	"encoding/json"
 
 	"{{.ProjectName}}/dto"
 	"{{.ProjectName}}/model"
 	"{{.ProjectName}}/service"
+	"{{.ProjectName}}/internal/redis"
 
 	"github.com/gin-gonic/gin"
 )
 
 type {{.EntityName}}Handler struct {
 	{{.EntityNameLower}}Service service.{{.EntityName}}Service
+	redisClient redis.IRedis
 }
 
-func New{{.EntityName}}Handler({{.EntityNameLower}}Service service.{{.EntityName}}Service) *{{.EntityName}}Handler {
-	return &{{.EntityName}}Handler{ {{.EntityNameLower}}Service: {{.EntityNameLower}}Service }
+func New{{.EntityName}}Handler({{.EntityNameLower}}Service service.{{.EntityName}}Service, redisClient redis.IRedis) *{{.EntityName}}Handler {
+	return &{{.EntityName}}Handler{ 
+	{{.EntityNameLower}}Service: {{.EntityNameLower}}Service,
+	redisClient: redisClient }
 }
 
 func (h *{{.EntityName}}Handler) Create{{.EntityName}}(c *gin.Context) {
@@ -45,6 +51,23 @@ func (h *{{.EntityName}}Handler) Create{{.EntityName}}(c *gin.Context) {
 	{{- end }}
 	}
 
+	if h.redisClient != nil {
+		// convert struct to json
+		respJSON, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Can not convert data")
+		} else {
+			redisKey := "{{.EntityNameLower}}_" + strconv.Itoa(resp.ID)
+			str, err := h.redisClient.Set(redisKey, string(respJSON))
+			if err != nil {
+				fmt.Println("Can not set data to redis cache")
+			} else {
+				fmt.Println("Successfully cached data " + str )
+			}
+		}
+	} else {
+		fmt.Println("Redis is not ready")
+	}
 	c.JSON(http.StatusCreated, resp)
 }
 
@@ -66,7 +89,22 @@ func (h *{{.EntityName}}Handler) Get{{.EntityName}}(c *gin.Context) {
 		{{.Name}}: obj.{{.Name}},
 	{{- end }}
 	}
-
+	if h.redisClient != nil {
+		respJSON, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Can not convert data")
+		} else {
+			redisKey := "{{ .EntityNameLower}}_" + strcon.Itoa(resp.ID)
+			str, err := h.redisClient.Get(redisKey)
+			if err != nil {
+				fmt.Println("No data found on cache")
+			} else {
+				fmt.Println("Data cached in Redis - Key:", redisKey, "Result: ", str)
+			}
+		}
+	} else {
+		fmt.Println("Redis is not ready")
+	}
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -148,6 +186,22 @@ func (h *{{.EntityName}}Handler) Delete{{.EntityName}}(c *gin.Context) {
 	if err := h.{{.EntityNameLower}}Service.Delete{{.EntityName}}(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete {{.EntityNameLower}}"})
 		return
+	}
+
+	if h.redisClient != nil {
+		redisKey := "{{ .EntityName}}_" + strconv.Itoa(id)
+		deletedCount, err := h.redisClient.Delete(redisKey)
+		if err != nil {
+			log.Println("❌ Failed to delete from Redis cache:", err.Error())
+		} else {
+			if deletedCount > 0 {
+				log.Println("🗑️ Successfully deleted from Redis cache - Key:", redisKey, "Count:", deletedCount)
+			} else {
+				log.Println("ℹ️ Key not found in Redis cache:", redisKey)
+			}
+		}
+	} else {
+		log.Println("⚠️ Redis client is not available - cache not deleted")
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "{{.EntityName}} deleted successfully"})

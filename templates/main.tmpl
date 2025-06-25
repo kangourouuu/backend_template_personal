@@ -32,7 +32,7 @@ import (
 	//swaggerFiles
 	//swaggerFiles
 	//"gorm.io/driver/postgres" 
-	_ "{{.ProjectName}}/docs"
+	//_ "{{.ProjectName}}/docs"
 
 	"gorm.io/gorm"
 )
@@ -48,6 +48,7 @@ type Config struct {
 
 var config Config
 var db *gorm.DB
+var redisClient redis.IRedis
 
 func init() {
 	// Parse environment variables
@@ -98,7 +99,7 @@ func init() {
 	}
 	if config.Redis == "enabled" {
 	var err error
-	redis.Redis, err = redis.NewRedis(redis.RedisConfig{
+	redisClient, err = redis.NewRedis(redis.RedisConfig{
 		Addr:         viper.GetString("redis.address"),
 		Password:     viper.GetString("redis.password"),
 		DB:           viper.GetInt("redis.db"),
@@ -139,7 +140,7 @@ func main() {
 	router.Use(customMiddleware.AuthMiddleWare())
 
 	// Register API routes
-	v2.SetupRoutes(router, db)
+	v2.SetupRoutes(router, db, redisClient)
 
 	// Start server
 	wg := sync.WaitGroup{}

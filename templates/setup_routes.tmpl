@@ -4,15 +4,16 @@ import (
 	api "{{.ProjectName}}/api/v2"
 	"{{.ProjectName}}/repository"
 	"{{.ProjectName}}/service"
+	"{{.ProjectName}}/internal/redis"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func SetupRoutes(r *gin.Engine, db *gorm.DB) {
+func SetupRoutes(r *gin.Engine, db *gorm.DB, redisClient redis.IRedis) {
 	{{.EntityNameLower}}Repo := repository.New{{.EntityName}}Repository(db)
 	{{.EntityNameLower}}Service := service.New{{.EntityName}}Service({{.EntityNameLower}}Repo)
-	{{.EntityNameLower}}Handler := api.New{{.EntityName}}Handler({{.EntityNameLower}}Service)
+	{{.EntityNameLower}}Handler := api.New{{.EntityName}}Handler({{.EntityNameLower}}Service, redisClient)
 
 	// API v2 routes
 	v2 := r.Group("/api/v2")

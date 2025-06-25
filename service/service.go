@@ -148,7 +148,6 @@ func (s *codeGenService) GenerateProject(ctx context.Context, projectName string
 		filepath.Join(basePath, "repository"),
 		filepath.Join(basePath, "server", "http"),
 		filepath.Join(basePath, "service"),
-		filepath.Join(basePath, "schema"),
 		filepath.Join(basePath, "tmp"),
 		filepath.Join(basePath, "dto"),
 		filepath.Join(basePath, "docs"),
@@ -167,6 +166,8 @@ func (s *codeGenService) GenerateProject(ctx context.Context, projectName string
 	}{
 		{"templates/main.tmpl", filepath.Join(basePath, "main.go")},
 		{"templates/go.mod.tmpl", filepath.Join(basePath, "go.mod")},
+		{"templates/docker.tmpl", filepath.Join(basePath, "Dockerfile")},
+		{"templates/docker-compose.tmpl", filepath.Join(basePath, "docker-compose.yml")},
 		{"templates/config.tmpl", filepath.Join(basePath, "configs", "config.json")},
 		{"templates/http_server.tmpl", filepath.Join(basePath, "server", "http", "http_server.go")},
 		{"templates/gorm_sql.tmpl", filepath.Join(basePath, "internal", "sqlclient", "gorm_sql.go")},
@@ -198,7 +199,7 @@ func (s *codeGenService) GenerateProject(ctx context.Context, projectName string
 		CreatedAt:   time.Now(),
 	}
 
-	err := s.repo.Create(info)
+	err := s.Create(info)
 	if err != nil {
 		fmt.Print("fail to insert")
 	}

@@ -7,13 +7,22 @@ import (
 	"backend_template_personal/common/log"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/joho/godotenv"
 )
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("env file can not be load")
+	}
+}
 
 func AuthMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		apiKey := os.Getenv("API_KEY")
 		if apiKey == "" {
-			log.Fatal("missing apikey for authorization")
+			log.Println("missing apikey for authorization")
 		}
 		apiKeyHeader := ctx.GetHeader("X-API-KEY")
 		if apiKeyHeader == "" || apiKeyHeader != apiKey {
