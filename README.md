@@ -8,11 +8,9 @@ commit and push to your branch
 git checkout main
 git merge "your branch" -->
 
-// install CLI for using swagger on terminal
-go install github.com/swaggo/swag/cmd/swag@latest
+go install github.com/swaggo/swag/cmd/swag@latest // install CLI for using swagger on terminal
 
-// install dependency for using docs
-go get github.com/swaggo/swag@latest
 
-// Initialize docs
-swag init create Docs
+go get github.com/swaggo/swag@latest // install dependency for using docs
+
+swag init create Docs // Initialize docs
