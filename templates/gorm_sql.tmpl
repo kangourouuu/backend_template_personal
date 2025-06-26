@@ -60,14 +60,26 @@ func (c *GormSqlClientConn) Connect() (err error) {
 			c.Database,
 			c.Port,
 		)
-		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-		if err != nil {
-			log.Fatal("Can not connect to DB")
-			return err
-		}
-		c.DB = db
+		
+		maxRetries := 5
+		for i := 0; i < maxRetries; i++ {
+			db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+			if err == nil {
+				c.DB = db
+				log.Printf("Successfully connected to database on attempt %d", i+1)
+				return nil
+			}
 
-		return nil
+			log.Printf("Failed to connect to database (attempt %d/%d): %v", i+1, maxRetries, err)
+			if i < maxRetries-1 {
+				waitTime := time.Duration(i+1) * 2 * time.Second
+				log.Printf("Retrying in %v...", waitTime)
+				time.Sleep(waitTime)
+			}
+		}
+
+		log.Fatal("Failed to connect to DB after all retries")
+		return err
 	default:
 		log.Fatal("driver is missing")
 		return errors.New("driver is missing")

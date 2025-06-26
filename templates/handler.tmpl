@@ -90,11 +90,11 @@ func (h *{{.EntityName}}Handler) Get{{.EntityName}}(c *gin.Context) {
 	{{- end }}
 	}
 	if h.redisClient != nil {
-		respJSON, err := json.Marshal(resp)
+		_, err := json.Marshal(resp)
 		if err != nil {
 			fmt.Println("Can not convert data")
 		} else {
-			redisKey := "{{ .EntityNameLower}}_" + strcon.Itoa(resp.ID)
+			redisKey := "{{ .EntityNameLower}}_" + strconv.Itoa(resp.ID)
 			str, err := h.redisClient.Get(redisKey)
 			if err != nil {
 				fmt.Println("No data found on cache")
@@ -189,19 +189,19 @@ func (h *{{.EntityName}}Handler) Delete{{.EntityName}}(c *gin.Context) {
 	}
 
 	if h.redisClient != nil {
-		redisKey := "{{ .EntityName}}_" + strconv.Itoa(id)
+		redisKey := "{{ .EntityNameLower}}_" + strconv.Itoa(id)
 		deletedCount, err := h.redisClient.Delete(redisKey)
 		if err != nil {
-			log.Println("❌ Failed to delete from Redis cache:", err.Error())
+			fmt.Println("❌ Failed to delete from Redis cache:", err.Error())
 		} else {
 			if deletedCount > 0 {
-				log.Println("🗑️ Successfully deleted from Redis cache - Key:", redisKey, "Count:", deletedCount)
+				fmt.Println("🗑️ Successfully deleted from Redis cache - Key:", redisKey, "Count:", deletedCount)
 			} else {
-				log.Println("ℹ️ Key not found in Redis cache:", redisKey)
+				fmt.Println("ℹ️ Key not found in Redis cache:", redisKey)
 			}
 		}
 	} else {
-		log.Println("⚠️ Redis client is not available - cache not deleted")
+		fmt.Println("⚠️ Redis client is not available - cache not deleted")
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "{{.EntityName}} deleted successfully"})
