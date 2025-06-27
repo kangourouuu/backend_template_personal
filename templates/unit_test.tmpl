@@ -1,0 +1,430 @@
+package v2
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"net/http"
+	"net/http/httptest"
+	"test_project/dto"
+	"test_project/model"
+	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+// Mock test service
+type mock{{ .EntityName }}Service struct {
+	mock.Mock
+}
+
+func (m *mock{{ .EntityName }}Service) Create{{ .EntityName }}(t *model.{{ .EntityName }}) error {
+	args := m.Called(t)
+	return args.Error(0)
+}
+
+func (m *mock{{ .EntityName }}Service) Get{{ .EntityName }}ByID(id uint) (*model.{{ .EntityName }}, error) {
+	args := m.Called(id)
+	var result *model.{{ .EntityName }}
+	if args.Get(0) != nil {
+		result = args.Get(0).(*model.{{ .EntityName }})
+	}
+
+	return result, args.Error(1)
+}
+
+func (m *mock{{ .EntityName }}Service) GetAll{{ .EntityName }}s() ([]*model.{{ .EntityName }}, error) {
+	args := m.Called()
+	var result []*model.{{ .EntityName }}
+
+	if args.Get(0) != nil {
+		result = args.Get(0).([]*model.{{ .EntityName }})
+	}
+
+	return result, args.Error(1)
+}
+
+func (m *mock{{ .EntityName }}Service) Update{{ .EntityName }}(t *model.{{ .EntityName }}) error {
+	args := m.Called(t)
+	return args.Error(0)
+}
+
+func (m *mock{{ .EntityName }}Service) Delete{{ .EntityName }}(id uint) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
+
+// Mock redis client
+type mockRedisClient struct {
+	mock.Mock
+}
+
+func (m *mockRedisClient) Connect() error {
+	args := m.Called()
+	return args.Error(0)
+}
+
+func (m *mockRedisClient) Set(key string, value string) (string, error) {
+	args := m.Called(key, value)
+	return args.String(0), args.Error(1)
+}
+
+func (m *mockRedisClient) Get(key string) (string, error) {
+	args := m.Called(key)
+	return args.String(0), args.Error(1)
+}
+
+func (m *mockRedisClient) Delete(key string) (int64, error) {
+	args := m.Called(key)
+	return int64(args.Int(0)), args.Error(1)
+}
+
+func (m *mockRedisClient) GetClient() *redis.Client {
+	args := m.Called()
+	return args.Get(0).(*redis.Client)
+}
+
+func (m *mockRedisClient) Ping() error {
+	args := m.Called()
+	return args.Error(0)
+}
+
+// test-case create
+func TestCreate(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	mockSvc := new(mock{{ .EntityName }}Service)
+	mockRc := new(mockRedisClient)
+	handler := &{{ .EntityName }}Handler{
+		{{ .EntityName }}Service: mockSvc,
+		redisClient: mockRc,
+	}
+
+	t.Run("success", func(t *testing.T) {
+		reqBody := dto.Create{{ .EntityName }}Request{
+			Name:  "Khanh",
+			Price: 2.55,
+		}
+
+		jsonData, _ := json.Marshal(reqBody)
+
+		req, _ := http.NewRequest(http.MethodPost, "/test", bytes.NewBuffer(jsonData))
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+
+		// mock test service
+		mockSvc.On("Create{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(nil)
+
+		// mock test redis
+		mockRc.On("Set", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return("OK", nil)
+
+		r := gin.Default()
+		r.POST("/test", handler.Create{{ .EntityName }})
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusCreated, w.Code)
+		mockSvc.AssertExpectations(t)
+		mockRc.AssertExpectations(t)
+	})
+
+	t.Run("invalidJSON", func(t *testing.T) {
+
+		jsonData := []byte(`{name : "Khanh", "price":2.55}`)
+
+		req, _ := http.NewRequest(http.MethodPost, "/test", bytes.NewBuffer(jsonData))
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+
+		// mock test service
+		mockSvc.On("Create{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(nil)
+
+		// mock test redis
+		mockRc.On("Set", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return("OK", nil)
+
+		r := gin.Default()
+		r.POST("/test", handler.Create{{ .EntityName }})
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("redisErr", func(t *testing.T) {
+		resp := dto.Create{{ .EntityName }}Request{
+			Name:  "Khanh",
+			Price: 2.55,
+		}
+
+		jsonData, _ := json.Marshal(resp)
+
+		req, _ := http.NewRequest(http.MethodPost, "/test", bytes.NewBuffer(jsonData))
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+
+		// mock test service
+		mockSvc.On("Create{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(nil)
+
+		// mock test redis
+		mockRc.On("Set", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return("", errors.New("redis error"))
+
+		r := gin.Default()
+		r.POST("/test", handler.Create{{ .EntityName }})
+
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusCreated, w.Code)
+	})
+}
+
+// test-case getAll
+func TestGetAll(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockSv := new(mock{{ .EntityName }}Service)
+	mockRc := new(mockRedisClient)
+	handler := &{{ .EntityName }}Handler{
+		{{ .EntityName }}Service: mockSv,
+		redisClient: mockRc,
+	}
+	t.Run("success", func(t *testing.T) {
+
+		req, _ := http.NewRequest(http.MethodGet, "/test", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("GetAll{{ .EntityName }}s").Return([]*model.{{ .EntityName }}{
+			{ID: 1, Name: "Khanh", Price: 2.55},
+		},nil)
+
+		mockRc.On("Get", mock.AnythingOfType("string")).Return("OK", nil)
+
+		r := gin.Default()
+		r.GET("/test", handler.GetAll{{ .EntityName }}s)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodGet, "/test", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("GetAll{{ .EntityName }}s").Return([]*model.{{ .EntityName }}{},nil)
+
+		mockRc.On("Get", mock.AnythingOfType("string")).Return("OK", nil)
+
+		r := gin.Default()
+		r.GET("/test", handler.GetAll{{ .EntityName }}s)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("id valid", func(t *testing.T) {
+
+		req, _ := http.NewRequest(http.MethodGet, "/test/1", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
+			ID: 1, Name: "Khanh", Price: 2.55,
+		}, nil)
+
+		mockRc.On("Get", mock.AnythingOfType("string")).Return("OK", nil)
+
+		r := gin.Default()
+		r.GET("/test/:id", handler.Get{{ .EntityName }})
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("id invalid", func(t *testing.T) {
+
+		req, _ := http.NewRequest(http.MethodGet, "/test/abc", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.GET("/test/:id", handler.Get{{ .EntityName }})
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+	t.Run("id not found", func(t *testing.T) {
+		mockSv.On("GetTestByID", uint(999)).Return(nil, errors.New("not found"))
+		mockRc.On("Get", "test_999").Return("", errors.New("cache miss"))
+
+		req, _ := http.NewRequest(http.MethodGet, "/test/999", nil)
+		w := httptest.NewRecorder()
+
+		r := gin.Default()
+		r.GET("/test/:id", handler.Get{{ .EntityName }})
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
+}
+
+
+func TestUpdate(t *testing.T) {
+	mockSv := new(mockTestService)
+	mockRc := new(mockRedisClient)
+	handler := &TestHandler{
+		testService: mockSv,
+		redisClient: mockRc,
+	}
+	t.Run("success", func(t *testing.T) {
+		reqBody := dto.UpdateTestRequest{
+			ID:    1,
+			Name:  "Khanh",
+			Price: 3.55,
+		}
+
+		jsonData, _ := json.Marshal(reqBody)
+
+		req, _ := http.NewRequest(http.MethodPut, "/test/1", bytes.NewBuffer(jsonData))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("GetTestByID", uint(1)).Return(&model.Test{
+			ID: 1, Name: "Khanh", Price: 2.55,
+		}, nil)
+
+		mockSv.On("UpdateTest", mock.AnythingOfType("*model.Test")).Return(nil)
+
+		r := gin.Default()
+		r.PUT("/test/:id", handler.UpdateTest)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("invalid json", func(t *testing.T) {
+		jsonData := []byte(`{id : 1, "name" : "Giang Khanh", "price" : 3.55}`)
+
+		req, _ := http.NewRequest(http.MethodPut, "/test/1", bytes.NewBuffer(jsonData))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("GetTestByID", uint(1)).Return(&model.Test{
+			ID: 1, Name: "Khanh", Price: 2.55,
+		}, nil)
+
+		mockSv.On("UpdateTest", mock.AnythingOfType("*model.Test")).Return(errors.New("invalid input"))
+
+		r := gin.Default()
+		r.PUT("/test/:id", handler.UpdateTest)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("missing required fields", func(t *testing.T) {
+		jsonData := []byte(`{"id" : 1, "name" : "", "price" : 3.55}`)
+
+		req, _ := http.NewRequest(http.MethodPut, "/test/1", bytes.NewBuffer(jsonData))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("GetTestByID", uint(1)).Return(&model.Test{
+			ID: 1, Name: "Khanh", Price: 2.55,
+		}, nil)
+
+		mockSv.On("UpdateTest", mock.AnythingOfType("*model.Test")).Return(errors.New("invalid input"))
+
+		r := gin.Default()
+		r.PUT("/test/:id", handler.UpdateTest)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("id not found", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodPut, "/test/2", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("GetTestByID", uint(2)).Return(nil, errors.New("id not found"))
+
+		// mockSv.On("DeleteTest", uint(2)).Return(errors.New("id not found"))
+
+		r := gin.Default()
+		r.DELETE("/test/:id", handler.UpdateTest)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
+}
+
+func TestDelete(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockSv := new(mock{{ .EntityName }}Service)
+	mockRc := new(mockRedisClient)
+	handler := &{{ .EntityName }}Handler{
+		{{ .EntityName }}Service: mockSv,
+		redisClient: mockRc,
+	}
+	t.Run("success", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodDelete, "/test/1", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
+			ID: 1, Name: "Khanh", Price: 2.55,
+		}, nil)
+
+		mockSv.On("Delete{{ .EntityName }}", uint(1)).Return(nil)
+
+		mockRc.On("Delete", mock.AnythingOfType("string")).Return(1, nil)
+
+		r := gin.Default()
+		r.DELETE("/test/:id", handler.Delete{{ .EntityName }})
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("id invalid", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodDelete, "/test/abc", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		// mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
+		// 	ID: 1, Name: "Khanh",Price: 2.55,
+		// }, nil)
+
+		mockSv.On("Delete{{ .EntityName }}", uint(1)).Return(nil)
+
+		mockRc.On("Delete", mock.AnythingOfType("string")).Return(1, nil)
+
+		r := gin.Default()
+		r.DELETE("/test/:id", handler.Delete{{ .EntityName }})
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+	t.Run("id not found", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodDelete, "/test/2", nil)
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		mockSv.On("Get{{ .EntityName }}ByID", uint(2)).Return(nil, errors.New("id not found"))
+
+		// mockSv.On("Delete{{ .EntityName }}", uint(2)).Return(errors.New("id not found"))
+
+		r := gin.Default()
+		r.DELETE("/test/:id", handler.Delete{{ .EntityName }})
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
+}
+

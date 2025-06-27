@@ -156,6 +156,11 @@ func (h *{{.EntityName}}Handler) Update{{.EntityName}}(c *gin.Context) {
 	{{- end }}
 	}
 
+	if req.Name == "" || req.Price <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing required fields"})
+		return
+	}
+
 	if err := h.{{$.EntityNameLower}}Service.Update{{.EntityName}}({{.EntityNameLower}}); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update {{$.EntityNameLower}}"})
 		return
@@ -183,8 +188,13 @@ func (h *{{.EntityName}}Handler) Delete{{.EntityName}}(c *gin.Context) {
 		return
 	}
 
-	if err := h.{{.EntityNameLower}}Service.Delete{{.EntityName}}(uint(id)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete {{.EntityNameLower}}"})
+	err := h.{{.EntityNameLower}}Service.Delete{{.EntityName}}(uint(id))
+	if err != nil {
+		if err.Error() == "id not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "ID not found"})
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete test"})
 		return
 	}
 
