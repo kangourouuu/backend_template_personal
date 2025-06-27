@@ -1,5 +1,3 @@
-Sure! Here’s your entire README.md content translated into clear, professional English, with Markdown formatting preserved and improved for clarity and structure:
-
 🎉 Code Generator
 
 An automated Go code generator with simple REST APIs — quickly bootstrap projects and generate CRUD code, saved directly to your C:/ drive.
