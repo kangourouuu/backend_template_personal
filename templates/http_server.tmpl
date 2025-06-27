@@ -58,6 +58,6 @@ func Start(server *gin.Engine, port string) {
 			close(v)
 		}
 	}()
-	log.Infof("service %v listening on port %v", port)
+	log.Infof("service is listening on port %v", port)
 	<-v
 }

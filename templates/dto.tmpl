@@ -3,14 +3,14 @@ package dto
 type Create{{.EntityName}}Request struct {
 {{- range .Fields }}
 	{{- if ne .Name "ID" }}
-	{{.Name}} {{.Type}} `json:"{{ lowerFirst .Name }}" validate:"required"`
+	{{.Name}} {{.Type}} `json:"{{ ToLower .Name }}" validate:"required"`
 	{{- end }}
 {{- end }}
 }
 
 type Update{{.EntityName}}Request struct {
 {{- range .Fields }}
-	{{.Name}} {{.Type}} `json:"{{ lowerFirst .Name }}" validate:"required"`
+	{{.Name}} {{.Type}} `json:"{{ ToLower .Name }}" validate:"required"`
 {{- end }}
 }
 

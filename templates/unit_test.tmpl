@@ -67,7 +67,7 @@ func (m *mockRedisClient) Connect() error {
 	return args.Error(0)
 }
 
-func (m *mockRedisClient) Set(key string, value string) (string, error) {
+func (m *mockRedisClient) Set(key string, value interface{}) (string, error) {
 	args := m.Called(key, value)
 	return args.String(0), args.Error(1)
 }
@@ -99,7 +99,7 @@ func TestCreate(t *testing.T) {
 	mockSvc := new(mock{{ .EntityName }}Service)
 	mockRc := new(mockRedisClient)
 	handler := &{{ .EntityName }}Handler{
-		{{ .EntityName }}Service: mockSvc,
+		{{ .EntityNameLower }}Service: mockSvc,
 		redisClient: mockRc,
 	}
 
@@ -132,7 +132,7 @@ func TestCreate(t *testing.T) {
 		mockRc.AssertExpectations(t)
 	})
 
-	t.Run("invalidJSON", func(t *testing.T) {
+	t.Run("invalid json", func(t *testing.T) {
 
 		jsonData := []byte(`{name : "Khanh", "price":2.55}`)
 
@@ -145,7 +145,7 @@ func TestCreate(t *testing.T) {
 		mockSvc.On("Create{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(nil)
 
 		// mock test redis
-		mockRc.On("Set", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return("OK", nil)
+		mockRc.On("Set", mock.AnythingOfType("string"), mock.AnythingOfType("interface{}")).Return("OK", nil)
 
 		r := gin.Default()
 		r.POST("/test", handler.Create{{ .EntityName }})
@@ -189,7 +189,7 @@ func TestGetAll(t *testing.T) {
 	mockSv := new(mock{{ .EntityName }}Service)
 	mockRc := new(mockRedisClient)
 	handler := &{{ .EntityName }}Handler{
-		{{ .EntityName }}Service: mockSv,
+		{{ .EntityNameLower }}Service: mockSv,
 		redisClient: mockRc,
 	}
 	t.Run("success", func(t *testing.T) {
@@ -275,14 +275,14 @@ func TestGetAll(t *testing.T) {
 
 
 func TestUpdate(t *testing.T) {
-	mockSv := new(mockTestService)
+	mockSv := new(mock{{ .EntityName }}Service)
 	mockRc := new(mockRedisClient)
 	handler := &TestHandler{
-		testService: mockSv,
+		{{ .EntityNameLower }}Service: mockSv,
 		redisClient: mockRc,
 	}
 	t.Run("success", func(t *testing.T) {
-		reqBody := dto.UpdateTestRequest{
+		reqBody := dto.Update{{ .EntityName }}Request{
 			ID:    1,
 			Name:  "Khanh",
 			Price: 3.55,
@@ -294,14 +294,14 @@ func TestUpdate(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
-		mockSv.On("GetTestByID", uint(1)).Return(&model.Test{
+		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
 			ID: 1, Name: "Khanh", Price: 2.55,
 		}, nil)
 
-		mockSv.On("UpdateTest", mock.AnythingOfType("*model.Test")).Return(nil)
+		mockSv.On("Update{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(nil)
 
 		r := gin.Default()
-		r.PUT("/test/:id", handler.UpdateTest)
+		r.PUT("/test/:id", handler.Update{{ .EntityName }})
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
@@ -314,14 +314,14 @@ func TestUpdate(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
-		mockSv.On("GetTestByID", uint(1)).Return(&model.Test{
+		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
 			ID: 1, Name: "Khanh", Price: 2.55,
 		}, nil)
 
-		mockSv.On("UpdateTest", mock.AnythingOfType("*model.Test")).Return(errors.New("invalid input"))
+		mockSv.On("Update{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(errors.New("invalid input"))
 
 		r := gin.Default()
-		r.PUT("/test/:id", handler.UpdateTest)
+		r.PUT("/test/:id", handler.Update{{ .EntityName }})
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -334,14 +334,14 @@ func TestUpdate(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
-		mockSv.On("GetTestByID", uint(1)).Return(&model.Test{
+		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
 			ID: 1, Name: "Khanh", Price: 2.55,
 		}, nil)
 
-		mockSv.On("UpdateTest", mock.AnythingOfType("*model.Test")).Return(errors.New("invalid input"))
+		mockSv.On("Update{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(errors.New("invalid input"))
 
 		r := gin.Default()
-		r.PUT("/test/:id", handler.UpdateTest)
+		r.PUT("/test/:id", handler.Update{{ .EntityName }})
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -352,12 +352,12 @@ func TestUpdate(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
-		mockSv.On("GetTestByID", uint(2)).Return(nil, errors.New("id not found"))
+		mockSv.On("Get{{ .EntityName }}ByID", uint(2)).Return(nil, errors.New("id not found"))
 
-		// mockSv.On("DeleteTest", uint(2)).Return(errors.New("id not found"))
+		// mockSv.On("Delete{{ .EntityName }}", uint(2)).Return(errors.New("id not found"))
 
 		r := gin.Default()
-		r.DELETE("/test/:id", handler.UpdateTest)
+		r.DELETE("/test/:id", handler.Update{{ .EntityName }})
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusNotFound, w.Code)
@@ -369,7 +369,7 @@ func TestDelete(t *testing.T) {
 	mockSv := new(mock{{ .EntityName }}Service)
 	mockRc := new(mockRedisClient)
 	handler := &{{ .EntityName }}Handler{
-		{{ .EntityName }}Service: mockSv,
+		{{ .EntityNameLower }}Service: mockSv,
 		redisClient: mockRc,
 	}
 	t.Run("success", func(t *testing.T) {

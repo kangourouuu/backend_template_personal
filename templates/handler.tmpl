@@ -1,4 +1,4 @@
-package api
+package v2
 
 import (
 	"net/http"
@@ -188,7 +188,7 @@ func (h *{{.EntityName}}Handler) Delete{{.EntityName}}(c *gin.Context) {
 		return
 	}
 
-	err := h.{{.EntityNameLower}}Service.Delete{{.EntityName}}(uint(id))
+	err = h.{{.EntityNameLower}}Service.Delete{{.EntityName}}(uint(id))
 	if err != nil {
 		if err.Error() == "id not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": "ID not found"})
