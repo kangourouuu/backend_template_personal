@@ -133,7 +133,7 @@ Sau khi ứng dụng khởi chạy, bạn có thể:
 
 ---
 
-## 📁 Cấu trúc thư mục
+## 📁 Cấu trúc thư mục sau khi sinh ra
 
 ```
 C:/ProjectName/
