@@ -138,6 +138,8 @@ Sau khi ứng dụng khởi chạy, bạn có thể:
 ```
 C:/ProjectName/
 ├── main.go             # File chính khởi chạy ứng dụng
+├── Dockerfile             # Build container Docker
+├── docker-compose.yaml    # Build service 
 ├── api/
 │   └── v2/             # API versioning
 ├── build/              # Script build hoặc pipeline
