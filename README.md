@@ -1,118 +1,91 @@
-# 🎉 Code Generator
+Sure! Here’s your entire README.md content translated into clear, professional English, with Markdown formatting preserved and improved for clarity and structure:
 
-**Một công cụ tự động sinh mã nguồn Go với API tiện dụng — giúp bạn tạo nhanh dự án và mã CRUD, lưu trữ tại ổ đĩa `C:/`.**
+🎉 Code Generator
 
----
+An automated Go code generator with simple REST APIs — quickly bootstrap projects and generate CRUD code, saved directly to your C:/ drive.
 
-## 📚 Mục lục
+📚 Table of Contents
+	•	🔰 Introduction
+	•	✨ Features
+	•	⚙️ Requirements
+	•	📦 Installation
+	•	🚀 Usage
+	•	🧩 API Reference
+	•	1. Generate Project
+	•	2. Generate CRUD Code
+	•	📁 Generated Folder Structure
 
-* [🔰 Giới thiệu](#-giới-thiệu)
-* [✨ Tính năng](#-tính-năng)
-* [⚙️ Yêu cầu](#️-yêu-cầu)
-* [📦 Cài đặt](#-cài-đặt)
-* [🚀 Cách sử dụng](#-cách-sử-dụng)
-* [🧩 API](#-api)
+🔰 Introduction
 
-  * [1. Tạo dự án](#1-tạo-dự-án)
-  * [2. Tạo mã CRUD](#2-tạo-mã-crud)
-* [📁 Cấu trúc thư mục sau khi sinh ra](#-cấu-trúc-thư-mục-sau-khi-sinh-ra)
+Code Generator is a tool designed to automate Go project scaffolding and CRUD code generation.
 
----
+You can use the provided APIs to:
+	•	Generate a standard Go project folder structure
+	•	Generate CRUD boilerplate for your custom entities
 
-## 🔰 Giới thiệu
+📍 All generated code is saved to: C:/ProjectName/
 
-**Code Generator** là một công cụ giúp tự động hóa việc tạo mã nguồn cho các dự án Go.
-Bạn chỉ cần gọi API để sinh:
+This tool is ideal for developers looking to speed up project setup or quickly build basic backend logic.
 
-* Cấu trúc dự án Go chuẩn
-* Mã CRUD cho các thực thể (entity)
+✨ Features
+	•	✅ Automatically creates a complete Go project structure
+	•	✅ Generates customizable CRUD code for any entity
+	•	✅ Simple and flexible REST APIs
+	•	✅ Saves code in C:/ with clean folder organization
 
-📍 **Mã sẽ được sinh tại:** `C:/ProjectName/`
+⚙️ Requirements
+	•	Go 1.16 or higher
+	•	Windows OS (required for writing files to C:/)
+	•	API tools like Postman, cURL, Insomnia, etc.
 
-Công cụ lý tưởng cho lập trình viên muốn tiết kiệm thời gian khởi tạo và phát triển tính năng cơ bản.
+📦 Installation
 
----
-
-## ✨ Tính năng
-
-* ✅ Tự động tạo cấu trúc thư mục cho dự án Go
-* ✅ Sinh mã CRUD với trường tùy chỉnh
-* ✅ API đơn giản, dễ tích hợp
-* ✅ Lưu mã tại `C:/` với cấu trúc rõ ràng
-
----
-
-## ⚙️ Yêu cầu
-
-* Go **1.16** trở lên
-* Hệ điều hành: **Windows** (mã được sinh tại `C:/`)
-* Công cụ gửi request: Postman, `cURL`, Insomnia, v.v.
-
----
-
-## 📦 Cài đặt
-
-```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/kangourouuu/backend_template_personal.git
 
-# Di chuyển vào thư mục
+# Navigate into the project directory
 cd backend_template_personal
 
-# Cài đặt các gói phụ thuộc
+# Download dependencies
 go mod tidy
 
-# Chạy ứng dụng
+# Run the application
 go run main.go
-```
 
-Ứng dụng sẽ chạy tại: [http://localhost:9000](http://localhost:9000)
+📍 The app will run at: http://localhost:9000
 
----
+🚀 Usage
 
-## 🚀 Cách sử dụng
+Once the application is running, you can:
+	1.	Generate a new Go project
+	2.	Generate CRUD code for your defined entity
 
-Sau khi ứng dụng khởi chạy, bạn có thể:
+📌 Notes:
+	•	Ensure C:/ has write permissions
+	•	Use valid JSON in your API requests
+	•	You can send requests using Postman or any HTTP client
 
-1. Tạo dự án Go mới
-2. Sinh mã CRUD cho một thực thể
+🧩 API Reference
 
-📌 **Lưu ý:**
+1. Generate Project
+	•	Endpoint: POST /api/v1/generate-project
+	•	Description: Creates a new Go project folder at C:/ProjectName/
 
-* Đảm bảo ổ `C:/` có quyền ghi
-* Sử dụng định dạng JSON hợp lệ trong các request
-* Gửi request qua Postman hoặc bất kỳ HTTP client nào
+📨 Request (JSON)
 
----
-
-## 🧩 API
-
-### 1. Tạo dự án
-
-* **Endpoint:** `POST /api/v1/generate-project`
-* **Mô tả:** Tạo một dự án mới với cấu trúc thư mục đầy đủ tại `C:/ProjectName/`
-
-#### 📨 Request (JSON)
-
-```json
 {
   "project_name": "MyNewProject",
   "port": "8080"
 }
-```
 
-📂 **Kết quả:** Thư mục `C:/MyNewProject/` được tạo
+📂 Result: A project folder will be created at C:/MyNewProject/
 
----
+2. Generate CRUD Code
+	•	Endpoint: POST /api/v1/generate-crud
+	•	Description: Generates CRUD boilerplate for a custom entity with your defined fields
 
-### 2. Tạo mã CRUD
+📨 Request (JSON)
 
-* **Endpoint:** `POST /api/v1/generate-crud`
-* **Mô tả:** Sinh mã CRUD cho một thực thể với các trường tự định nghĩa
-
-#### 📨 Request (JSON)
-
-```json
 {
   "entity_name": "User",
   "entity_name_lower": "user",
@@ -127,40 +100,34 @@ Sau khi ứng dụng khởi chạy, bạn có thể:
     }
   ]
 }
-```
 
-📂 **Kết quả:** Mã CRUD được tạo trong thư mục `C:/MyNewProject/`
+📂 Result: CRUD code will be generated under C:/MyNewProject/
 
----
+📁 Generated Folder Structure
 
-## 📁 Cấu trúc thư mục sau khi sinh ra
-
-```
 C:/ProjectName/
-├── main.go             # File chính khởi chạy ứng dụng
-├── Dockerfile             # Build container Docker
-├── docker-compose.yaml    # Build service 
+├── main.go                 # Entry point of the application
+├── Dockerfile              # Docker container build file
+├── docker-compose.yaml     # Service orchestration
 ├── api/
-│   └── v2/             # API versioning
-├── build/              # Script build hoặc pipeline
-├── common/             # Logic dùng chung
-│   ├── api_response/   # Phản hồi chuẩn API
-│   ├── err_response/   # Xử lý lỗi
-│   ├── log/            # Ghi log
-│   └── limiter/        # Cấu hình giới hạn request
-├── configs/            # Cấu hình ứng dụng
-├── constant/           # Các hằng số dùng chung
-├── internal/           
-│   ├── sqlclient/      # Kết nối cơ sở dữ liệu
-│   └── redis/          # Logic Redis
-├── middleware/         # Middleware xử lý request
-├── model/              # Định nghĩa các entity/model
-├── repository/         # Truy cập dữ liệu
-├── server/             
-│   └── http/           # Khởi tạo HTTP server
-├── service/            # Business logic
-├── tmp/                # Tạm thời (temporary files)
-├── dto/                # Data Transfer Object
-└── docs/               # Tài liệu dự án
-```
-
+│   └── v2/                 # API versioning
+├── build/                  # Build scripts or CI/CD pipelines
+├── common/                 # Shared logic
+│   ├── api_response/       # Standard API response formatting
+│   ├── err_response/       # Error handling logic
+│   ├── log/                # Logging
+│   └── limiter/            # Rate limiter configuration
+├── configs/                # Application configuration
+├── constant/               # Shared constants
+├── internal/
+│   ├── sqlclient/          # SQL client setup
+│   └── redis/              # Redis integration logic
+├── middleware/             # Request/response middleware
+├── model/                  # Entity/model definitions
+├── repository/             # Data access layer
+├── server/
+│   └── http/               # HTTP server setup
+├── service/                # Business logic layer
+├── tmp/                    # Temporary files
+├── dto/                    # Data Transfer Objects (DTOs)
+└── docs/                   # Project documentation
