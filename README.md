@@ -96,8 +96,8 @@ Sau khi ứng dụng khởi chạy, bạn có thể:
 
 ```json
 {
-  "ProjectName": "MyNewProject",
-  "Port": "8080"
+  "project_name": "MyNewProject",
+  "port": "8080"
 }
 ```
 
@@ -114,16 +114,16 @@ Sau khi ứng dụng khởi chạy, bạn có thể:
 
 ```json
 {
-  "EntityName": "User",
-  "EntityNameLower": "user",
-  "Fields": [
+  "entity_name": "User",
+  "entity_name_lower": "user",
+  "fields": [
     {
-      "Name": "ID",
-      "Type": "int"
+      "name": "ID",
+      "type": "int"
     },
     {
-      "Name": "Name",
-      "Type": "string"
+      "name": "Name",
+      "type": "string"
     }
   ]
 }
