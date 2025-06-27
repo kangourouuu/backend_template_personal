@@ -1,4 +1,4 @@
-Code Generator
+#Code Generator
 Một công cụ tự động sinh mã nguồn dựa trên Go, cung cấp các API để tạo dự án và mã CRUD cho các thực thể, với mã được sinh ra tại ổ C:/.
 Mục lục
 
@@ -86,26 +86,26 @@ Output: Mã CRUD được sinh ra trong thư mục dự án tại C:/ProjectName
 Cấu trúc thư mục
 Cấu trúc mã nguồn được sinh ra tại C:/ProjectName/ sẽ bao gồm:
 C:/ProjectName/
-├── cmd/                # Chứa file chính để chạy ứng dụng
-│   └── main.go         # Điểm vào của ứng dụng
-├── api/                # Chứa mã liên quan đến API (v2, v1, v3 nếu có)
+├── main.go             # File chính để chạy ứng dụng
+├── api/                # Chứa mã liên quan đến API
 │   └── v2/             # Phân chia các phiên bản API
-│       ├── generate.go # Xử lý API generate-project và generate-crud
 ├── build/              # Chứa các file build hoặc script build
-├── common/             # Chứa code chung (utils, err response, log)
+├── common/             # Code chung
+│   ├── api_response/   # Xử lý phản hồi API
 │   ├── err_response/   # Xử lý lỗi trả về
 │   ├── log/            # Logic logging
-│   └── utils/          # Hàm tiện ích chung
-├── config/             # Cấu hình ứng dụng (limiter, constant, sqlclient)
-│   ├── limiter/        # Cấu hình giới hạn (nếu có)
-│   ├── constant/       # Hằng số
-│   └── sqlclient/      # Cấu hình kết nối SQL
-├── internal/           # Code nội bộ (không export)
-│   ├── redis/          # Logic liên quan đến Redis
-│   └── middleware/     # Middleware (nếu có)
+│   └── limiter/        # Cấu hình giới hạn
+├── configs/            # Cấu hình ứng dụng
+├── constant/           # Hằng số
+├── internal/           # Code nội bộ
+│   ├── sqlclient/      # Cấu hình kết nối SQL
+│   └── redis/          # Logic liên quan đến Redis
+├── middleware/         # Middleware
 ├── model/              # Định nghĩa các model/thực thể
 ├── repository/         # Logic truy cập dữ liệu
-│   └── http/           # Repository HTTP (nếu có)
+├── server/             # Logic server
+│   └── http/           # Repository HTTP
 ├── service/            # Logic nghiệp vụ
-├── docs/               # Tài liệu dự án
-└── .env                # File môi trường (nếu có)
+├── tmp/                # Thư mục tạm
+├── dto/                # Data Transfer Objects
+└── docs/               # Tài liệu dự án
