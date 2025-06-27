@@ -10,9 +10,10 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"backend_template_personal/model"
 	"backend_template_personal/repository"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Field struct {
@@ -172,15 +173,17 @@ func (s *codeGenService) GenerateProject(ctx context.Context, projectName string
 		{"templates/http_server.tmpl", filepath.Join(basePath, "server", "http", "http_server.go")},
 		{"templates/gorm_sql.tmpl", filepath.Join(basePath, "internal", "sqlclient", "gorm_sql.go")},
 		{"templates/init_repo.tmpl", filepath.Join(basePath, "internal", "repository.go")},
+		{"templates/redis.tmpl", filepath.Join(basePath, "internal", "redis", "redis.go")},
 		{"templates/log.tmpl", filepath.Join(basePath, "common", "log", "log.go")},
-		{"templates/auth.tmpl", filepath.Join(basePath, "middleware", "auth.go")},
-		{"templates/env.tmpl", filepath.Join(basePath, ".env")},
 		{"templates/err_response.tmpl", filepath.Join(basePath, "common", "err_response", "error.go")},
 		{"templates/result_response.tmpl", filepath.Join(basePath, "common", "api_response", "response.go")},
+		{"templates/limiter.tmpl", filepath.Join(basePath, "common", "limiter", "limiter.go")},
+		{"templates/auth.tmpl", filepath.Join(basePath, "middleware", "auth.go")},
+		{"templates/env.tmpl", filepath.Join(basePath, ".env")},
 		{"templates/constant.tmpl", filepath.Join(basePath, "constant", "constant.go")},
 		{"templates/readme.tmpl", filepath.Join(basePath, "README.md")},
-		{"templates/limiter.tmpl", filepath.Join(basePath, "common", "limiter", "limiter.go")},
-		{"templates/redis.tmpl", filepath.Join(basePath, "internal", "redis", "redis.go")},
+		{"templates/unit_test.tmpl", filepath.Join(basePath, "api", "v2", strings.ToLower(entityName) + "_handler_test.go")},
+
 		// {"templates/docs.tmpl", filepath.Join(basePath, "docs", "docs.go")},
 		// {"templates/swagger.json.tmpl", filepath.Join(basePath, "docs", "swagger.json")},
 		// {"templates/swagger.yaml.tmpl", filepath.Join(basePath, "docs", "swagger.yaml")},

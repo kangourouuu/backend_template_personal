@@ -16,6 +16,6 @@ type Update{{.EntityName}}Request struct {
 
 type {{.EntityName}}Response struct {
 {{- range .Fields }}
-	{{.Name}} {{.Type}} `json:"{{ lowerFirst .Name }}"`
+	{{.Name}} {{.Type}} `json:"{{ ToLower .Name }}"`
 {{- end }}
 }
