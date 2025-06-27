@@ -15,7 +15,7 @@
 
   * [1. Tạo dự án](#1-tạo-dự-án)
   * [2. Tạo mã CRUD](#2-tạo-mã-crud)
-* [📁 Cấu trúc thư mục](#-cấu-trúc-thư-mục)
+* [📁 Cấu trúc thư mục sau khi sinh ra](#-cấu-trúc-thư-mục-sau-khi-sinh-ra)
 
 ---
 
