@@ -1,4 +1,4 @@
-#Code Generator
+🎉 Code Generator
 Một công cụ tự động sinh mã nguồn dựa trên Go, cung cấp các API để tạo dự án và mã CRUD cho các thực thể, với mã được sinh ra tại ổ C:/.
 Mục lục
 
@@ -11,14 +11,13 @@ API
 Cấu trúc thư mục
 
 Giới thiệu
-Dự án Code Generator là một công cụ giúp tự động hóa việc tạo mã nguồn cho các dự án Go. Nó cung cấp hai API để sinh cấu trúc dự án và mã CRUD dựa trên các tham số đầu vào. Mã được sinh ra sẽ được lưu tại ổ C:/ với thư mục chính là tên dự án (C:/ProjectName/).
-Dự án này phù hợp cho các nhà phát triển muốn tiết kiệm thời gian khi khởi tạo dự án hoặc tạo các đoạn mã CRUD cơ bản.
+Dự án Code Generator là một công cụ giúp tự động hóa việc tạo mã nguồn cho các dự án Go. Nó cung cấp hai API để sinh cấu trúc dự án và mã CRUD dựa trên các tham số đầu vào. Mã được sinh ra sẽ được lưu tại ổ C:/ với thư mục chính là tên dự án (C:/ProjectName/). Dự án này phù hợp cho các nhà phát triển muốn tiết kiệm thời gian khi khởi tạo dự án hoặc tạo các đoạn mã CRUD cơ bản.
 Tính năng
 
-Tự động tạo cấu trúc thư mục cho dự án Go.
-Sinh mã CRUD cho các thực thể với các trường tùy chỉnh.
-API đơn giản, dễ sử dụng với đầu vào linh hoạt.
-Lưu mã nguồn tại ổ C:/ với cấu trúc rõ ràng.
+✅ Tự động tạo cấu trúc thư mục cho dự án Go.
+✅ Sinh mã CRUD cho các thực thể với các trường tùy chỉnh.
+✅ API đơn giản, dễ sử dụng với đầu vào linh hoạt.
+✅ Lưu mã nguồn tại ổ C:/ với cấu trúc rõ ràng.
 
 Yêu cầu
 
@@ -31,11 +30,10 @@ Cài đặt
 Clone repository:git clone https://github.com/kangourouuu/backend_template_personal.git
 
 
-Di chuyển vào thư mục dự án:cd code-generator
+Di chuyển vào thư mục dự án:cd backend_template_personal
 
 
-Cài đặt các gói phụ thuộc: go mod tidy
-
+Cài đặt các gói phụ thuộc:go mod tidy
 
 Chạy ứng dụng:go run main.go
 
@@ -53,18 +51,19 @@ API
 Dự án cung cấp hai API chính:
 1. Tạo dự án
 
-Endpoint: POST http://localhost:9000/api/v2/generate-project
+Endpoint: POST http://localhost:9000/api/v1/generate-project
 Mô tả: Tạo một dự án Go mới với cấu trúc thư mục tại C:/ProjectName/.
 Input (JSON):{
   "ProjectName": "MyNewProject",
   "Port": "8080"
 }
 
+
 Output: Thư mục dự án được tạo tại C:/MyNewProject/.
 
 2. Tạo mã CRUD
 
-Endpoint: POST http://localhost:9000/api/v2/generate-crud
+Endpoint: POST http://localhost:9000/api/v1/generate-crud
 Mô tả: Tạo mã CRUD cho một thực thể với các trường tùy chỉnh.
 Input (JSON):{
   "EntityName": "User",
@@ -80,6 +79,7 @@ Input (JSON):{
     }
   ]
 }
+
 
 Output: Mã CRUD được sinh ra trong thư mục dự án tại C:/ProjectName/.
 
