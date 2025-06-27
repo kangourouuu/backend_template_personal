@@ -1,5 +1,3 @@
-
-
 🎉 Code Generator
 
 An automated Go source code generator with handy APIs — helping you quickly create projects and CRUD code, saved directly to the C:/ drive.
@@ -118,16 +116,15 @@ C:/ProjectName/
 │   └── limiter/            # Rate limiter settings
 ├── configs/                # Application configuration files
 ├── constant/               # Shared constants
-├── internal/           
+├── internal/
 │   ├── sqlclient/          # SQL database client config
 │   └── redis/              # Redis logic and config
 ├── middleware/             # Middleware handlers
 ├── model/                  # Entity/model definitions
 ├── repository/             # Data access layer
-├── server/             
+├── server/
 │   └── http/               # HTTP server setup
 ├── service/                # Business logic layer
 ├── tmp/                    # Temporary files
 ├── dto/                    # Data Transfer Objects
 └── docs/                   # Project documentation
-
