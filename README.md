@@ -1,42 +1,59 @@
-🎉 Code Generator
+# 🎉 Code Generator
 
-An automated Go source code generator with handy APIs — helping you quickly create projects and CRUD code, saved directly to the C:/ drive.
+**An automated Go source code generator with RESTful APIs — helping you quickly scaffold projects and CRUD logic, saved directly to the `C:/` drive.**
 
-📚 Table of Contents
-	•	🔰 Introduction
-	•	✨ Features
-	•	⚙️ Requirements
-	•	📦 Installation
-	•	🚀 Usage
-	•	🧩 API
-	•	1. Generate Project
-	•	2. Generate CRUD Code
-	•	📁 Generated Folder Structure
+---
 
-🔰 Introduction
+## 📚 Table of Contents
 
-Code Generator is a tool that automates the creation of Go source code projects.
-You only need to call APIs to generate:
-	•	A standard Go project structure
-	•	CRUD code for your entities
+* [🔰 Introduction](#-introduction)
+* [✨ Features](#-features)
+* [⚙️ Requirements](#-requirements)
+* [📦 Installation](#-installation)
+* [🚀 Usage](#-usage)
+* [🧩 API](#-api)
 
-📍 Generated code will be saved at: C:/ProjectName/
+  * [1. Generate Project](#1-generate-project)
+  * [2. Generate CRUD Code](#2-generate-crud-code)
+* [📁 Generated Folder Structure](#-generated-folder-structure)
 
-This tool is ideal for developers looking to save time when setting up new projects or implementing basic CRUD logic.
+---
 
-✨ Features
-	•	✅ Automatically generate a Go project folder structure
-	•	✅ Generate CRUD code with customizable fields
-	•	✅ Simple, flexible API
-	•	✅ Source code saved in C:/ with clear structure
+## 🔰 Introduction
 
-⚙️ Requirements
-	•	Go 1.16 or later
-	•	Operating system: Windows (code is generated at C:/)
-	•	HTTP client tools: Postman, cURL, Insomnia, etc.
+**Code Generator** is a tool designed to automate the creation of Go-based backend projects.
 
-📦 Installation
+It allows you to:
 
+* ✅ Automatically generate a clean project folder structure
+* ✅ Create CRUD code for custom entities
+
+📍 All generated files are saved at: `C:/ProjectName/`
+
+Perfect for developers who want to save time during project initialization or quickly build basic features.
+
+---
+
+## ✨ Features
+
+* ✅ Auto-generate Go project folder structure
+* ✅ Generate CRUD logic based on custom entity fields
+* ✅ RESTful API interface for flexibility and ease
+* ✅ Saves all code under `C:/` with organized layout
+
+---
+
+## ⚙️ Requirements
+
+* Go **1.16** or newer
+* OS: **Windows** (required for saving under `C:/`)
+* An HTTP client (e.g., Postman, `cURL`, Insomnia, etc.)
+
+---
+
+## 📦 Installation
+
+```bash
 # Clone the repository
 git clone https://github.com/kangourouuu/backend_template_personal.git
 
@@ -48,41 +65,55 @@ go mod tidy
 
 # Run the application
 go run main.go
+```
 
-The application will run at: http://localhost:9000
+The server will start at: [http://localhost:9000](http://localhost:9000)
 
-🚀 Usage
+---
 
-After starting the application, you can:
-	1.	Generate a new Go project
-	2.	Generate CRUD code for an entity
+## 🚀 Usage
 
-📌 Note:
-	•	Make sure C:/ has write permission
-	•	Use valid JSON format in requests
-	•	Send requests via Postman or any HTTP client
+Once the app is running, you can:
 
-🧩 API
+1. Generate a Go project
+2. Generate CRUD code for a specific entity
 
-1. Generate Project
-	•	Endpoint: POST /api/v1/generate-project
-	•	Description: Create a new Go project with full folder structure at C:/ProjectName/
+📌 **Notes:**
 
-📨 Request (JSON)
+* Ensure the `C:/` drive has write permissions
+* Use valid JSON in request bodies
+* Use Postman or similar tools to interact with the APIs
 
+---
+
+## 🧩 API
+
+### 1. Generate Project
+
+* **Endpoint:** `POST /api/v1/generate-project`
+* **Description:** Creates a new Go project at `C:/ProjectName/`
+
+#### 📨 Sample Request
+
+```json
 {
   "project_name": "MyNewProject",
   "port": "8080"
 }
+```
 
-📂 Result: A project folder will be created at C:/MyNewProject/
+📂 **Result:** Folder `C:/MyNewProject/` is created with the full project scaffold.
 
-2. Generate CRUD Code
-	•	Endpoint: POST /api/v1/generate-crud
-	•	Description: Generate CRUD code for an entity with custom fields
+---
 
-📨 Request (JSON)
+### 2. Generate CRUD Code
 
+* **Endpoint:** `POST /api/v1/generate-crud`
+* **Description:** Generates CRUD logic for a custom entity inside an existing project.
+
+#### 📨 Sample Request
+
+```json
 {
   "entity_name": "User",
   "entity_name_lower": "user",
@@ -97,34 +128,40 @@ After starting the application, you can:
     }
   ]
 }
+```
 
-📂 Result: CRUD code will be generated inside C:/MyNewProject/
+📂 **Result:** CRUD code for the `User` entity is generated in `C:/MyNewProject/`.
 
-📁 Generated Folder Structure
+---
 
+## 📁 Generated Folder Structure
+
+```
 C:/ProjectName/
 ├── main.go                 # Entry point of the application
-├── Dockerfile              # Docker container build file
-├── docker-compose.yaml     # Service orchestration config
+├── Dockerfile              # Docker container definition
+├── docker-compose.yaml     # Service orchestration
 ├── api/
 │   └── v2/                 # API versioning
-├── build/                  # Build scripts or CI/CD pipelines
-├── common/                 # Shared utilities
-│   ├── api_response/       # Standardized API responses
-│   ├── err_response/       # Error handling
-│   ├── log/                # Logging logic
-│   └── limiter/            # Rate limiter settings
-├── configs/                # Application configuration files
-├── constant/               # Shared constants
+├── build/                  # Build scripts / CI configs
+├── common/                 # Shared logic
+│   ├── api_response/       # API response formatting
+│   ├── err_response/       # Error handling logic
+│   ├── log/                # Logging setup
+│   └── limiter/            # Rate limiter configs
+├── configs/                # Application config files
+├── constant/               # Constant definitions
 ├── internal/
-│   ├── sqlclient/          # SQL database client config
-│   └── redis/              # Redis logic and config
+│   ├── sqlclient/          # SQL client configuration
+│   └── redis/              # Redis setup
 ├── middleware/             # Middleware handlers
-├── model/                  # Entity/model definitions
+├── model/                  # Data models / entities
 ├── repository/             # Data access layer
 ├── server/
-│   └── http/               # HTTP server setup
+│   └── http/               # HTTP server logic
 ├── service/                # Business logic layer
 ├── tmp/                    # Temporary files
 ├── dto/                    # Data Transfer Objects
 └── docs/                   # Project documentation
+```
+
