@@ -10,11 +10,11 @@ COPY . .
 
 RUN go build -o main .
 
-FROM scratch 
+//FROM scratch 
 
-WORKDIR /app
+//WORKDIR /app
 
-COPY --from=BUILDER /build /app/
+//COPY --from=BUILDER /build /app/
 
 EXPOSE {{ .Port}}
 

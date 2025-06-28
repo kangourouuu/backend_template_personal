@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/postgres"
@@ -56,14 +57,26 @@ func (c *GormSqlClientConn) Connect() (err error) {
 			c.Database,
 			c.Port,
 		)
-		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-		if err != nil {
-			log.Fatal("Can not connect to DB")
-			return err
-		}
-		c.DB = db
 
-		return nil
+		maxRetries := 5
+		for i := range maxRetries {
+			db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+			if err == nil {
+				c.DB = db 
+				log.Printf("Connected to database on attempt %d", i + 1)
+				return nil
+			}
+
+			log.Printf("Failed to connect to database on attempt %d", i + 1)
+			if i < maxRetries - 1 {
+				waitTime := time.Duration(i+1) * 2 * time.Second
+				log.Printf("Retrying in %v ...", waitTime)
+				time.Sleep(waitTime)
+			}
+		}
+
+		log.Fatal("Failed to connect to database after all rettries")
+		return err
 	default:
 		log.Fatal("driver is missing")
 		return errors.New("driver is missing")

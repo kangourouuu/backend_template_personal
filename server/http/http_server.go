@@ -24,7 +24,7 @@ func NewHTTPServer() *gin.Engine {
 	// engine.Use(recoverMdw.ErrorHandler)
 	// engine.Use(recoverMdw.Recover(true))
 	// engine.Use(CORSMiddleware())
-	engine.Use(allowOptionsMethod())
+	// engine.Use(allowOptionsMethod())
 	// engine.Use(responsetime.Handler)
 	engine.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
