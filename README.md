@@ -84,8 +84,6 @@ docker-compose up --build
 | `docker ps`                  | List running containers                    |
 | `docker logs <container-id>` | View logs from a specific container        |
 
-
-
 📌 After startup, the service will be accessible at: http://localhost:9000
 
 This will automatically build and run the service as defined in docker-compose.yml.
