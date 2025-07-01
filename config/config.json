@@ -7,7 +7,7 @@
 		"redis": "enabled"
 	},
 	"db": {
-		"host": "postgres",
+		"host": "localhost",
 		"port": 5432,
 		"username": "postgres",
 		"password": "Quockhanh208@",

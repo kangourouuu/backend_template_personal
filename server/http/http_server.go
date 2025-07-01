@@ -1,69 +1,76 @@
 package server
 
 import (
+	"context"
+	"errors"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	log "github.com/tel4vn-team/go-utility/logging/slog"
-
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 const (
-	serviceName = "template-service"
-	version     = "v0.0.1"
+	serviceName = "backend_template"
+	version     = "0.0.1"
 )
 
-func NewHTTPServer() *gin.Engine {
-	// For Production
-	gin.SetMode(gin.ReleaseMode)
+// Server wraps the http.Server to manage the server's lifecycle.
+type Server struct {
+	httpServer *http.Server
+}
+
+// New creates a new server instance. It takes a port and a Gin engine.
+func New(port string, engine *gin.Engine) *Server {
+	return &Server{
+		httpServer: &http.Server{
+			Addr:    ":" + port,
+			Handler: engine,
+		},
+	}
+}
+
+// NewEngine initializes a new gin.Engine with default middleware and a health check endpoint.
+func NewEngine() *gin.Engine {
 	engine := gin.New()
-	engine.MaxMultipartMemory = 100 << 20
-	// APM
-	// engine.Use(apmgin.Middleware(engine))
-	// engine.Use(recoverMdw.ErrorHandler)
-	// engine.Use(recoverMdw.Recover(true))
-	// engine.Use(CORSMiddleware())
-	// engine.Use(allowOptionsMethod())
-	// engine.Use(responsetime.Handler)
-	engine.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
+	engine.GET("/service", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
 			"service": serviceName,
 			"version": version,
-			"time":    time.Now().Unix(),
 		})
 	})
 	return engine
 }
 
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, X-Tenant-Id, X-Tenant-Uuid, X-Tenant-Name, X-User-Id, X-User-Level, X-User-Name")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, PATCH, DELETE, OPTIONS")
-		c.Next()
-	}
-}
-
-func allowOptionsMethod() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusOK)
-			return
-		}
-		c.Next()
-	}
-}
-
-func Start(server *gin.Engine, port string) {
-	v := make(chan struct{})
+// Run starts the server and blocks until a shutdown signal is received.
+// It handles the graceful shutdown of the server.
+func (s *Server) Run() error {
 	go func() {
-		if err := server.Run(":" + port); err != nil {
-			log.Error("failed to start service", err)
-			close(v)
+		logrus.Infof("Service '%s' listening on %s", serviceName, s.httpServer.Addr)
+		if err := s.httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logrus.Fatalf("Failed to start server: %v", err)
 		}
 	}()
-	log.Infof("service %v listening on port %v", serviceName, port)
-	<-v
+
+	// Wait for interrupt signal to gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logrus.Info("Shutting down server...")
+
+	// The context is used to inform the server it has 30 seconds to finish
+	// the requests it is currently handling.
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := s.httpServer.Shutdown(ctx); err != nil {
+		logrus.Errorf("Server forced to shutdown: %v", err)
+		return err
+	}
+
+	logrus.Info("Server exiting")
+	return nil
 }

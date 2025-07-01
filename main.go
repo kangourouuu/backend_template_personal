@@ -3,19 +3,17 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/caarlos0/env/v10"
-	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	v1 "backend_template_personal/api/v1"
+	"backend_template_personal/api"
 	slog "backend_template_personal/common/log"
 	"backend_template_personal/internal/sqlclient"
 	"backend_template_personal/middleware/auth"
 	"backend_template_personal/repository"
-	"backend_template_personal/service"
+	server "backend_template_personal/server/http"
 )
 
 type Config struct {
@@ -78,34 +76,19 @@ func init() {
 
 func main() {
 	// Initialize Gin router
-	router := gin.Default()
+	engine := server.NewEngine()
 
 	// Apply middleware
-	router.Use(auth.AuthMiddleWare())
+	engine.Use(auth.AuthMiddleWare())
 
-	// Initialize code generation service and handler
-	codeGenRepo := repository.NewProjectRepository(repository.GormSqlClient.GetDB())
-	codeGenService := service.NewCodeGenService(logrus.New(), codeGenRepo)
-	codeGenHandler := v1.NewCodeGenHandler(codeGenService)
+	apiV1 := engine.Group("/api/v1")
+	api.SetUpRoutes(apiV1)
 
-	// Register API routes
-	v1Group := router.Group("/api/v1")
-	{
-		v1Group.POST("/generate-crud", codeGenHandler.GenerateCRUD)
-		v1Group.POST("/generate-project", codeGenHandler.GenerateProject)
+	// Start the server
+	appServer := server.New(config.Port, engine)
+	if err := appServer.Run(); err != nil {
+		logrus.Fatalf("Server could not be started: %v", err)
 	}
-
-	// Start server
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		slog.Info("Server starting on port ", config.Port, " ============")
-		if err := router.Run(":" + config.Port); err != nil {
-			slog.Fatal("Failed to start server: ", err)
-		}
-	}()
-	wg.Wait()
 }
 
 func initRepo(gormSqlConfig sqlclient.GormSqlConfig) {
