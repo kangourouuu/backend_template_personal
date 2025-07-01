@@ -1,0 +1,19 @@
+{
+	"main": {
+		"port": "9000",
+		"log_type": "FILE",
+		"log_file": "tmp/console.log",
+		"db": "enabled",
+		"redis": "enabled"
+	},
+	"db": {
+		"host": "postgres",
+		"port": 5432,
+		"username": "postgres",
+		"password": "Quockhanh208@",
+		"database": "backend_template"
+	},
+	"auth_proxy": {
+		"auth_url": "http://localhost:8080"
+	}
+}
