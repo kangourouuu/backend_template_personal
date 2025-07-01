@@ -13,6 +13,7 @@ Ideal for bootstrapping backend services in seconds — with Docker, PostgreSQL,
 - ✨ Features
 - ⚙️ Requirements
 - 📦 Installation
+- 🐳 Docker Usage
 - 🚀 Usage
 - 🧩 API Reference
   - Generate Project
