@@ -12,8 +12,5 @@
 		"username": "postgres",
 		"password": "Quockhanh208@",
 		"database": "backend_template"
-	},
-	"auth_proxy": {
-		"auth_url": "http://localhost:8080"
 	}
 }
