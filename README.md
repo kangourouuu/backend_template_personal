@@ -75,14 +75,15 @@ docker run -p 9000:9000 code-generator
 docker-compose up --build
 
 ⚙️ Additional Docker Commands
-| Command                      | Description                          |
-| ---------------------------- | ------------------------------------ |
-| `docker-compose up`          | Start services                       |
-| `docker-compose up --build`  | Build and start services             |
-| `docker-compose stop`        | Stop containers                      |
-| `docker-compose down`        | Stop and remove containers + network |
-| `docker ps`                  | List running containers              |
-| `docker logs <container-id>` | View logs from container             |
+| Command                      | Description                                |
+| ---------------------------- | ------------------------------------------ |
+| `docker-compose up`          | Start services                             |
+| `docker-compose up --build`  | Build and start services                   |
+| `docker-compose stop`        | Stop containers                            |
+| `docker-compose down -v`     | Remove containers, network and volumes     |
+| `docker ps`                  | List running containers                    |
+| `docker logs <container-id>` | View logs from a specific container        |
+
 
 
 📌 After startup, the service will be accessible at: http://localhost:9000
