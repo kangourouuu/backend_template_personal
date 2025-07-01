@@ -62,6 +62,35 @@ go run main.go
 
 ---
 
+## 🐳 Docker Usage
+
+You can also run this project in a containerized environment using Docker or Docker Compose.
+
+```bash
+🔨 Build Docker Image
+docker build -t code-generator .
+▶️ Run with Docker
+docker run -p 9000:9000 code-generator
+🧱 Run with Docker Compose (Recommended)
+docker-compose up --build
+
+⚙️ Additional Docker Commands
+| Command                      | Description                          |
+| ---------------------------- | ------------------------------------ |
+| `docker-compose up`          | Start services                       |
+| `docker-compose up --build`  | Build and start services             |
+| `docker-compose stop`        | Stop containers                      |
+| `docker-compose down`        | Stop and remove containers + network |
+| `docker ps`                  | List running containers              |
+| `docker logs <container-id>` | View logs from container             |
+
+
+📌 After startup, the service will be accessible at: http://localhost:9000
+
+This will automatically build and run the service as defined in docker-compose.yml.
+```
+---
+
 ## 🚀 Usage
 
 You can use the provided APIs to:
