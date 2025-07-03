@@ -1,23 +1,21 @@
 package main
 
 import (
+	"backend_template_personal/cmd/generate"
+	"backend_template_personal/common/config"
+	"backend_template_personal/internal/sqlclient"
+	"backend_template_personal/repository"
 	"os"
 	"path/filepath"
 
+	_ "github.com/lib/pq" // PostgreSQL driver
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-
-	"backend_template_personal/api"
-	"backend_template_personal/common/config"
-	"backend_template_personal/internal/sqlclient"
-	"backend_template_personal/middleware/auth"
-	"backend_template_personal/repository"
-	server "backend_template_personal/server/http"
 )
 
 func init() {
 	err := config.InitConfig()
-	if err != nil {
+	if err !=nil {
 		logrus.Fatal("failed to read file config")
 	}
 
@@ -46,20 +44,7 @@ func init() {
 }
 
 func main() {
-	// Initialize Gin router
-	engine := server.NewEngine()
-
-	// Apply middleware
-	engine.Use(auth.AuthMiddleWare())
-
-	apiV1 := engine.Group("/api/v1")
-	api.SetUpRoutes(apiV1)
-
-	// Start the server
-	appServer := server.New(config.AppConfig.Port, engine)
-	if err := appServer.Run(); err != nil {
-		logrus.Fatalf("Server could not be started: %v", err)
-	}
+	generate.Execute()
 }
 
 func initRepo(gormSqlConfig sqlclient.GormSqlConfig) {
