@@ -13,6 +13,7 @@ Ideal for bootstrapping backend services in seconds — with Docker, PostgreSQL,
 - ✨ Features
 - ⚙️ Requirements
 - 📦 Installation
+- 🧰 CLI Tool
 - 🐳 Docker Usage
 - 🚀 Usage
 - 🧩 API Reference
@@ -29,7 +30,7 @@ Ideal for bootstrapping backend services in seconds — with Docker, PostgreSQL,
 ### What it does:
 - ✅ Scaffolds project structure and boilerplate files
 - ✅ Auto-generates CRUD endpoints based on user-defined entity fields
-- ✅ Uses RESTful APIs to trigger code generation dynamically
+- ✅ Uses RESTful APIs or CLI commands to trigger code generation dynamically
 
 ---
 
@@ -40,13 +41,14 @@ Ideal for bootstrapping backend services in seconds — with Docker, PostgreSQL,
 - ✅ Generates Docker/Docker Compose configuration for containerized development
 - ✅ Prewritten unit tests using Go’s `testing` and `testify`
 - ✅ Projects saved to `C:/ProjectName/`
+- ✅ Use both HTTP APIs and CLI for flexible code generation workflows
 
 ---
 
 ## ⚙️ Requirements
 - Go 1.16+
 - OS: Windows (for C:/ path support)
-- HTTP client (Postman, Insomnia, curl, etc.)
+- HTTP client (Postman, Insomnia, curl, etc.) or terminal for CLI
 
 ---
 
@@ -62,6 +64,25 @@ go run main.go
 > The server runs at: `http://localhost:9000`
 
 ---
+
+## 🧰 CLI Tool
+Besides HTTP API support, Code Generator also comes with a CLI tool (powered by Cobra).
+
+# Run CLI:
+```bash
+go run cmd/main.go --help
+```
+# Available CLI Commands:
+```bash
+- Generate Project
+go run cmd/main.go generate-project -n ProjectName -p Port ( int )
+
+Generate CRUD Code
+go run cmd/main.go generate-crud -E entityName -n projectName -f "name:string,price:float,available:bool"
+
+Note: The quantity of fields can adjust with the format "name:type" and is seperated with ","
+```
+
 
 ## 🐳 Docker Usage
 
