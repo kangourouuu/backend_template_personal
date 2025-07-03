@@ -68,20 +68,19 @@ go run main.go
 ## 🧰 CLI Tool
 Besides HTTP API support, Code Generator also comes with a CLI tool (powered by Cobra).
 
-# Run CLI:
+### Run CLI:
 ```bash
 go run cmd/main.go --help
 ```
-# Available CLI Commands:
+### Available CLI Commands:
 ```bash
 - Generate Project
 go run cmd/main.go generate-project -n ProjectName -p Port ( int )
 
-Generate CRUD Code
+- Generate CRUD Code
 go run cmd/main.go generate-crud -E entityName -n projectName -f "name:string,price:float,available:bool"
-
-Note: The quantity of fields can adjust with the format "name:type" and is seperated with ","
 ```
+**Note**: The quantity of fields can adjust with the format "name:type" and is seperated with ","
 
 
 ## 🐳 Docker Usage
