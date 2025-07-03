@@ -11,6 +11,7 @@ import (
 	"{{.ProjectName}}/service"
 	"{{.ProjectName}}/internal/redis"
 
+	"github.com/sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 )
 
@@ -84,7 +85,7 @@ func (h *{{.EntityName}}Handler) Get{{.EntityName}}(c *gin.Context) {
 		return
 	}
 
-	resp := dto.{{.EntityName}}Response{
+	resp := &dto.{{.EntityName}}Response{
 	{{- range .Fields }}
 		{{.Name}}: obj.{{.Name}},
 	{{- end }}
@@ -99,6 +100,10 @@ func (h *{{.EntityName}}Handler) Get{{.EntityName}}(c *gin.Context) {
 			if err != nil {
 				fmt.Println("No data found on cache")
 			} else {
+				err := json.Unmarshal([]byte(str), resp)
+				if err != nil {
+					logrus.Info("Failed to Unmarshal")
+				}
 				fmt.Println("Data cached in Redis - Key:", redisKey, "Result: ", str)
 			}
 		}
@@ -156,11 +161,6 @@ func (h *{{.EntityName}}Handler) Update{{.EntityName}}(c *gin.Context) {
 	{{- end }}
 	}
 
-	if req.Name == "" || req.Price <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing required fields"})
-		return
-	}
-
 	if err := h.{{$.EntityNameLower}}Service.Update{{.EntityName}}({{.EntityNameLower}}); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update {{$.EntityNameLower}}"})
 		return
@@ -194,7 +194,7 @@ func (h *{{.EntityName}}Handler) Delete{{.EntityName}}(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "ID not found"})
 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete test"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete {{ .EntityNameLower }}"})
 		return
 	}
 

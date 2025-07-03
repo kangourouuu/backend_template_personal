@@ -5,23 +5,74 @@ import (
 	"{{.ProjectName}}/repository"
 	"{{.ProjectName}}/service"
 	"{{.ProjectName}}/internal/redis"
+	"{{ .ProjectName }}/internal"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRoutes(r *gin.Engine, db *gorm.DB, redisClient redis.IRedis) {
-	{{.EntityNameLower}}Repo := repository.New{{.EntityName}}Repository(db)
+func SetupRoutes(r *gin.RouterGroup, redisClient redis.IRedis) {
+	{{.EntityNameLower}}Repo := repository.New{{.EntityName}}Repository(internal.GormSqlClient.GetDB())
 	{{.EntityNameLower}}Service := service.New{{.EntityName}}Service({{.EntityNameLower}}Repo)
 	{{.EntityNameLower}}Handler := v2.New{{.EntityName}}Handler({{.EntityNameLower}}Service, redisClient)
+	r.POST("/{{.EntityNameLower}}", {{.EntityNameLower}}Handler.Create{{.EntityName}})
+	r.GET("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Get{{.EntityName}})
+	r.GET("/{{.EntityNameLower}}", {{.EntityNameLower}}Handler.GetAll{{.EntityName}}s)
+	r.PUT("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Update{{.EntityName}})
+	r.DELETE("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Delete{{.EntityName}})
 
-	// API v2 routes
-	v2 := r.Group("/api/v2")
-	{
-		v2.POST("/{{.EntityNameLower}}", {{.EntityNameLower}}Handler.Create{{.EntityName}})
-		v2.GET("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Get{{.EntityName}})
-		v2.GET("/{{.EntityNameLower}}", {{.EntityNameLower}}Handler.GetAll{{.EntityName}}s)
-		v2.PUT("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Update{{.EntityName}})
-		v2.DELETE("/{{.EntityNameLower}}/:id", {{.EntityNameLower}}Handler.Delete{{.EntityName}})
-	}
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/openapi.json", func(c *gin.Context) {
+		c.File("./docs/swagger.json")
+	})
+
 }
+
+//@Summary Lấy tất cả {{.EntityNameLower}}
+//@Description Trả về thông tin danh sách {{ .EntityNameLower }}
+//@Tags {{ .EntityNameLower }}
+//@Produce json 
+//@Param id path int true "{{ .EntityNameLower }} ID" 
+//@Success 200 {object} model.{{.EntityName}} 
+//@Router /{{ .EntityNameLower }} [get] 
+func GetAll{{.EntityName}}s(c *gin.Context) {}
+
+// @Summary Lấy {{.EntityNameLower}} theo ID
+// @Description Trả về thông tin {{.EntityNameLower}} theo ID
+// @Tags {{.EntityNameLower}}
+// @Produce json
+// @Param id path int true "{{.EntityNameLower}} ID"
+// @Success 200 {object} model.{{.EntityName}}
+// @Router /{{.EntityNameLower}}/{id} [get]
+func Get{{.EntityName}}(c *gin.Context) {}
+
+// @Summary Thêm mới {{.EntityNameLower}}
+// @Description Thêm một đôi {{.EntityNameLower}} mới vào hệ thống
+// @Tags {{.EntityNameLower}}
+// @Accept json
+// @Produce json
+// @Param data body model.{{.EntityName}} true "{{.EntityNameLower}} info"
+// @Success 201 {object} model.{{.EntityName}}
+// @Router /{{.EntityNameLower}} [post]
+func Create{{.EntityName}}(c *gin.Context) {}
+
+// @Summary Xoá {{.EntityNameLower}}
+// @Description Xoá một đôi {{.EntityNameLower}} theo ID
+// @Tags {{.EntityNameLower}}
+// @Produce json
+// @Param id path int true "{{.EntityNameLower}} ID"
+// @Success 204
+// @Router /{{.EntityNameLower}}/{id} [delete]
+func Delete{{.EntityName}}(c *gin.Context) {}
+
+// @Summary Cập nhật {{.EntityNameLower}}
+// @Description Cập nhật thông tin một đôi {{.EntityNameLower}}
+// @Tags {{.EntityNameLower}}
+// @Accept json
+// @Produce json
+// @Param id path int true "{{.EntityNameLower}} ID"
+// @Param data body model.{{.EntityName}} true "{{.EntityNameLower}} info"
+// @Success 200 {object} model.{{.EntityName}}
+// @Router /{{.EntityNameLower}}/{id} [put]
+func Update{{.EntityName}}(c *gin.Context) {}

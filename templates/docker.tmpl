@@ -1,4 +1,4 @@
-FROM golang:1.24.2-alpine AS BUILDER
+FROM golang:1.24.2-alpine AS builder
 
 WORKDIR /build
 
@@ -10,12 +10,12 @@ COPY . .
 
 RUN go build -o main .
 
-//FROM scratch 
+#FROM scratch 
 
-//WORKDIR /app
+#WORKDIR /app
 
-//COPY --from=BUILDER /build /app/
+#COPY --from=BUILDER /build /app/
 
 EXPOSE {{ .Port}}
 
-CMD [ "/app" ]
+CMD [ "/build/main" ]

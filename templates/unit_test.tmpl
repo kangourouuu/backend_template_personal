@@ -6,8 +6,8 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"test_project/dto"
-	"test_project/model"
+	"{{ .ProjectName }}/dto"
+	"{{ .ProjectName }}/model"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -105,8 +105,9 @@ func TestCreate(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		reqBody := dto.Create{{ .EntityName }}Request{
-			Name:  "Khanh",
-			Price: 2.55,
+			// example, replace your fields in your dto
+			//Name:  "Khanh",
+			//Price: 2.55,
 		}
 
 		jsonData, _ := json.Marshal(reqBody)
@@ -157,8 +158,9 @@ func TestCreate(t *testing.T) {
 
 	t.Run("redisErr", func(t *testing.T) {
 		resp := dto.Create{{ .EntityName }}Request{
-			Name:  "Khanh",
-			Price: 2.55,
+			// example, replace your fields in your dto
+			//Name:  "Khanh",
+			//Price: 2.55,
 		}
 
 		jsonData, _ := json.Marshal(resp)
@@ -198,8 +200,9 @@ func TestGetAll(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
-		mockSv.On("GetAll{{ .EntityName }}s").Return([]*model.{{ .EntityName }}{
-			{ID: 1, Name: "Khanh", Price: 2.55},
+		mockSv.On("GetAll{{ .EntityName }}").Return([]*model.{{ .EntityName }}{
+			// example, replace your fields in your model
+			//{ID: 1, Name: "Khanh", Price: 2.55},
 		},nil)
 
 		mockRc.On("Get", mock.AnythingOfType("string")).Return("OK", nil)
@@ -234,7 +237,8 @@ func TestGetAll(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
-			ID: 1, Name: "Khanh", Price: 2.55,
+			// example, replace your fields in your model
+			//{ID: 1, Name: "Khanh", Price: 2.55},
 		}, nil)
 
 		mockRc.On("Get", mock.AnythingOfType("string")).Return("OK", nil)
@@ -259,7 +263,7 @@ func TestGetAll(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 	t.Run("id not found", func(t *testing.T) {
-		mockSv.On("GetTestByID", uint(999)).Return(nil, errors.New("not found"))
+		mockSv.On("Get{{.EntityName}}ByID", uint(999)).Return(nil, errors.New("not found"))
 		mockRc.On("Get", "test_999").Return("", errors.New("cache miss"))
 
 		req, _ := http.NewRequest(http.MethodGet, "/test/999", nil)
@@ -277,15 +281,16 @@ func TestGetAll(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	mockSv := new(mock{{ .EntityName }}Service)
 	mockRc := new(mockRedisClient)
-	handler := &TestHandler{
+	handler := &{{ .EntityName }}Handler{
 		{{ .EntityNameLower }}Service: mockSv,
 		redisClient: mockRc,
 	}
 	t.Run("success", func(t *testing.T) {
 		reqBody := dto.Update{{ .EntityName }}Request{
-			ID:    1,
-			Name:  "Khanh",
-			Price: 3.55,
+			// example, replace your fields in your dto
+			//ID:    1,
+			//Name:  "Khanh",
+			//Price: 3.55,
 		}
 
 		jsonData, _ := json.Marshal(reqBody)
@@ -295,7 +300,8 @@ func TestUpdate(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
-			ID: 1, Name: "Khanh", Price: 2.55,
+			// replace your fields in your model
+			//ID: 1, Name: "Khanh", Price: 2.55,
 		}, nil)
 
 		mockSv.On("Update{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(nil)
@@ -315,7 +321,8 @@ func TestUpdate(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
-			ID: 1, Name: "Khanh", Price: 2.55,
+			// example, replace your fields in your model
+			//{ID: 1, Name: "Khanh", Price: 2.55},
 		}, nil)
 
 		mockSv.On("Update{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(errors.New("invalid input"))
@@ -335,7 +342,8 @@ func TestUpdate(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
-			ID: 1, Name: "Khanh", Price: 2.55,
+			// example, replace your fields in your model
+			//{ID: 1, Name: "Khanh", Price: 2.55},
 		}, nil)
 
 		mockSv.On("Update{{ .EntityName }}", mock.AnythingOfType("*model.{{ .EntityName }}")).Return(errors.New("invalid input"))
@@ -378,7 +386,8 @@ func TestDelete(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		mockSv.On("Get{{ .EntityName }}ByID", uint(1)).Return(&model.{{ .EntityName }}{
-			ID: 1, Name: "Khanh", Price: 2.55,
+			// example, replace your fields in your model
+			//{ID: 1, Name: "Khanh", Price: 2.55},
 		}, nil)
 
 		mockSv.On("Delete{{ .EntityName }}", uint(1)).Return(nil)

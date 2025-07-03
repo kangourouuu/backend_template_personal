@@ -6,35 +6,32 @@
 package main
 
 import (
-	//"fmt"
-	"net/http"
+
 	"os"
 	"path/filepath"
-	"sync"
 
-	v2 "{{ .ProjectName }}/api"
+
+	api "{{ .ProjectName }}/api"
 	"{{ .ProjectName }}/common/log"
 	"{{ .ProjectName }}/internal"
 	"{{ .ProjectName }}/internal/sqlclient"
-	customMiddleware "{{ .ProjectName }}/middleware"
+	auth "{{ .ProjectName }}/middleware"
 	"{{ .ProjectName }}/common/limiter"
 	"{{ .ProjectName }}/internal/redis"
+	server "{{ .ProjectName }}/server/http"
 
 	"github.com/caarlos0/env/v10"
-	"github.com/gin-gonic/gin"
 	//"github.com/go-chi/chi/v5"
 	//"github.com/go-chi/chi/v5/middleware"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+
 
 	//swaggerFiles
 	//swaggerFiles
 	//"gorm.io/driver/postgres" 
 	//_ "{{.ProjectName}}/docs"
 
-	"gorm.io/gorm"
 )
 
 type Config struct {
@@ -47,7 +44,6 @@ type Config struct {
 }
 
 var config Config
-var db *gorm.DB
 var redisClient redis.IRedis
 
 func init() {
@@ -120,7 +116,6 @@ func init() {
 
 func initRepo(gormSqlConfig sqlclient.GormSqlConfig) {
 	internal.GormSqlClient = sqlclient.NewGormSqlClient(gormSqlConfig)
-	db = internal.GormSqlClient.GetDB()
 }
 
 func main() {
@@ -130,75 +125,19 @@ func main() {
 
 	logrus.Infof("DB name from config: %s", viper.GetString("db.database"))
 
-	router := gin.Default()
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	router.GET("/openapi.json", func(c *gin.Context) {
-		c.File("./docs/swagger.json")
-	})
 
-	// Apply middleware
-	router.Use(customMiddleware.AuthMiddleWare())
 
-	// Register API routes
-	v2.SetupRoutes(router, db, redisClient)
+	engine := server.NewEngine()
 
-	// Start server
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		logrus.Info("Server starting on port ", config.Port, " ============")
-		if err := http.ListenAndServe(":"+config.Port, router); err != nil {
-			logrus.Fatal("Failed to start server: ", err)
-		}
-	}()
-	wg.Wait()
+	engine.Use(auth.AuthMiddleWare())
+
+	apiV2 := engine.Group("/api/v2")
+	api.SetupRoutes(apiV2, redisClient)
+
+	appServer := server.New(config.Port, engine)
+	if err := appServer.Run(); err != nil {
+		logrus.Fatalf("Server could not be started: %v", err)
+	} 
 }
 
-//@Summary Lấy tất cả {{.EntityNameLower}}
-//@Description Trả về thông tin danh sách {{ .EntityNameLower }}
-//@Tags {{ .EntityNameLower }}
-//@Produce json 
-//@Param id path int true "{{ .EntityNameLower }} ID" 
-//@Success 200 {object} model.{{.EntityName}} 
-//@Router /{{ .EntityNameLower }} [get] 
-func GetAll{{.EntityName}}s(c *gin.Context) {}
 
-// @Summary Lấy {{.EntityNameLower}} theo ID
-// @Description Trả về thông tin {{.EntityNameLower}} theo ID
-// @Tags {{.EntityNameLower}}
-// @Produce json
-// @Param id path int true "{{.EntityNameLower}} ID"
-// @Success 200 {object} model.{{.EntityName}}
-// @Router /{{.EntityNameLower}}/{id} [get]
-func Get{{.EntityName}}(c *gin.Context) {}
-
-// @Summary Thêm mới {{.EntityNameLower}}
-// @Description Thêm một đôi {{.EntityNameLower}} mới vào hệ thống
-// @Tags {{.EntityNameLower}}
-// @Accept json
-// @Produce json
-// @Param data body model.{{.EntityName}} true "{{.EntityNameLower}} info"
-// @Success 201 {object} model.{{.EntityName}}
-// @Router /{{.EntityNameLower}} [post]
-func Create{{.EntityName}}(c *gin.Context) {}
-
-// @Summary Xoá {{.EntityNameLower}}
-// @Description Xoá một đôi {{.EntityNameLower}} theo ID
-// @Tags {{.EntityNameLower}}
-// @Produce json
-// @Param id path int true "{{.EntityNameLower}} ID"
-// @Success 204
-// @Router /{{.EntityNameLower}}/{id} [delete]
-func Delete{{.EntityName}}(c *gin.Context) {}
-
-// @Summary Cập nhật {{.EntityNameLower}}
-// @Description Cập nhật thông tin một đôi {{.EntityNameLower}}
-// @Tags {{.EntityNameLower}}
-// @Accept json
-// @Produce json
-// @Param id path int true "{{.EntityNameLower}} ID"
-// @Param data body model.{{.EntityName}} true "{{.EntityNameLower}} info"
-// @Success 200 {object} model.{{.EntityName}}
-// @Router /{{.EntityNameLower}}/{id} [put]
-func Update{{.EntityName}}(c *gin.Context) {}
